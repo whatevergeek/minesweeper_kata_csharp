@@ -1,10 +1,74 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace minesweeper_kata_csharp
 {
     public class Minesweeper
     {
+        public static string[] SweepMineField(int col, int row, string[] textMineField)
+        {
+            if (col == 0 && row == 0)
+                return new string[] {String.Empty};
+            if (String.IsNullOrWhiteSpace(textMineField?[0]))
+                return new string[] {"."};
+
+            var mineField = ConvertToIntMineField(col, row, textMineField);
+            var sweepedMineField = SweepMineField(mineField);
+
+            return ConvertToTextMineField(sweepedMineField);
+        }
+
+        public static int[,] ConvertToIntMineField(int col, int row, string[] textMineField)
+        {
+            int[,] mineField = new int[row, col];
+            int rowIndex = 0;
+            int colIndex = 0;
+
+            foreach (var textRow in textMineField)
+            {
+                foreach (char c in textRow)
+                {
+                    mineField[rowIndex, colIndex] = c == '*' ? -1 : 0;
+                    colIndex++;
+                }
+                colIndex = 0;
+                rowIndex++;
+            }
+
+            return mineField;
+        }
+        public static string[] ConvertToTextMineField(int[,] mineField)
+        {
+            List<string> textMineField = new List<string>();
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int row = 0; row < mineField.GetLength(0); row++)
+            {
+                for (int col = 0; col < mineField.GetLength(1); col++)
+                {
+                    switch (mineField[row, col])
+                    {
+                        case 0:
+                            sb.Append(".");
+                            break;
+                        case -1:
+                            sb.Append("*");
+                            break;
+                        default:
+                            sb.Append(mineField[row, col].ToString());
+                            break;
+                    }
+                }
+
+                textMineField.Add(sb.ToString());
+                sb = new StringBuilder();
+            }
+
+            return textMineField.ToArray();
+        }
+
         public static int[,] SweepMineField(int[,] mineField)
         {
             // get mine locations
